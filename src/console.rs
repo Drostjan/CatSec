@@ -58,9 +58,9 @@ impl Console {
         io::stdin().read_line(&mut site).unwrap();
 
         let pass = Password {
-            username,
-            password,
-            site
+            username: username.replace("\n", ""),
+            password: password,
+            site: site.replace("\n", "")
         };
 
         self.passwords.add_password(pass);
@@ -84,7 +84,7 @@ impl Console {
     }
 
     pub fn list(&self){
-        println!("{:#?}",self.passwords)
+        println!("{:#?}",self.passwords);
     }
 
     pub fn show(&self){
