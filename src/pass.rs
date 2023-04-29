@@ -13,6 +13,11 @@ pub struct PassStorage {
 }
 
 impl PassStorage {
+    pub fn new() -> PassStorage {
+        PassStorage {
+            passwords: Vec::new(),
+        }
+    }
     pub fn add_password(&mut self, password: Password) {
         self.passwords.push(password);
     }
