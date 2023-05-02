@@ -22,23 +22,30 @@ impl PassStorage {
         self.passwords.push(password);
     }
 
-    pub fn update_password(&mut self, site: &str, new_password: &str) -> bool {
+    pub fn update_password(&mut self, site: &str, new_password: &str) {
         for password in self.passwords.iter_mut() {
             if password.site == site {
                 password.password = new_password.to_string();
-                return true;
+
             }
         }
-        false
     }
 
-    pub fn delete_password(&mut self, site: &str) -> bool {
-        if let Some(index) = self.passwords.iter().position(|p| p.site == site) {
-            self.passwords.remove(index);
-            true
-        } else {
-            false
+    pub fn delete_password(&mut self, site: String){
+        for i in 0..self.passwords.len() {
+            if self.passwords[i].site == site {
+                self.passwords.remove(i);
+            }
         }
+    }
+
+    pub fn get_password(&self, site: String) -> Option<Password>{
+        for pass in self.passwords.iter() {
+            if pass.site == site {
+                return Some(pass.clone())
+            }
+        }
+        return None;
     }
 
     

@@ -80,7 +80,12 @@ impl Console {
     }
 
     pub fn del(&mut self){
+        print!("site to delete password data:");
+        io::stdout().flush().ok();
+        let mut site = String::new();
+        io::stdin().read_line(&mut site).unwrap();
 
+        self.passwords.delete_password(site);
     }
 
     pub fn list(&self){
@@ -88,7 +93,13 @@ impl Console {
     }
 
     pub fn show(&self){
+        print!("site to show password data:");
+        io::stdout().flush().ok();
+        let mut site = String::new();
+        io::stdin().read_line(&mut site).unwrap();
 
+        let pass = self.passwords.get_password(site);
+        println!("{:#?}",pass);
     }
 
     pub fn help(&self) {

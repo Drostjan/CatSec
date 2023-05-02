@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "catsec"
-version = "0.2.12"
+version = "0.3.5"
 dependencies = [
  "md5",
  "rpassword",
