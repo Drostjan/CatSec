@@ -37,6 +37,12 @@ fn main() {
             "show" => {
                 catsec.show()
             },
+            "save" => {
+                catsec.save()
+            },
+            "load" => {
+                catsec.load()
+            },
             "q" => keepalive = false,
             _ => {
                 println!("Incorrect operation , try with: ");

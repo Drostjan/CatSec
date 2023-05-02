@@ -41,13 +41,20 @@ impl PassStorage {
         }
     }
 
-    pub fn get_password(&self, site: String) -> Option<Password>{
+    pub fn get_password(&self, site: String){
+        let mut the_password = None;
         for pass in self.passwords.iter() {
             if pass.site == site {
-                return Some(pass.clone())
+                the_password = Some(pass.clone());
+                print!("{}", pass.password);
             }
         }
-        return None;
+
+        if let Some(password) = the_password {
+            println!("{:?}", password);
+        } else {
+            println!("No found site '{}'", site);
+        }
     }
 
     pub fn save(&self, filename: &str) {

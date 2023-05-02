@@ -1,14 +1,18 @@
 use std::io;
 use std::io::Write;
+extern crate hex;
 
 use aes::Aes128;
 use aes::cipher::{
-    BlockCipher, BlockEncrypt, BlockDecrypt, KeyInit,
+    BlockEncrypt, KeyInit,
     generic_array::GenericArray,
 };
 
 use rpassword::read_password;
 use crate::pass::*;
+
+const BLOCK_SIZE: usize = 16;
+
 
 pub struct Console {
     logged: bool,
@@ -65,19 +69,24 @@ impl Console {
         let mut site = String::new();
         io::stdin().read_line(&mut site).unwrap();
 
+        let block_size = BLOCK_SIZE;
+        let pad_size = block_size - (password.as_bytes().len() % block_size);
+        let mut padded_password = Vec::from(password.as_bytes());
+        padded_password.extend(vec![pad_size as u8; pad_size]);
+
+        
         let key = GenericArray::from([0u8; 16]);
         self.key = key.to_vec();
-        
         let mut block = GenericArray::default();
-        block.copy_from_slice(password.as_bytes());
+        block.copy_from_slice(&padded_password[..block_size]);
+        
         let cipher = Aes128::new(&key);
-
         cipher.encrypt_block(&mut block);
-        let ciphertext = String::from_utf8(block.to_vec()).unwrap();
+        let ciphertext = hex::encode(block);
 
         let pass = Password {
             username: username.replace("\n", ""),
-            password: ciphertext.to_string(),
+            password: ciphertext,
             site: site.replace("\n", "")
         };
 
@@ -116,8 +125,8 @@ impl Console {
         let mut site = String::new();
         io::stdin().read_line(&mut site).unwrap();
 
-        let pass = self.passwords.get_password(site);
-        println!("{:#?}",pass);
+        self.passwords.get_password(site)
+
     }
 
     pub fn help(&self) {
@@ -129,12 +138,22 @@ impl Console {
         println!(" q ............. exit program");
     }
 
-    pub fn save(&self, filename: &str) {
-        self.passwords.save(filename);
+    pub fn save(&self) {
+        print!("password storage save on file:");
+        io::stdout().flush().ok();
+        let mut filename = String::new();
+        io::stdin().read_line(&mut filename).unwrap();
+
+        self.passwords.save(&filename);
     }
 
-    pub fn load(&mut self, filename: &str){
-        self.passwords.load(filename);
+    pub fn load(&mut self){
+        print!("file to password storage:");
+        io::stdout().flush().ok();
+        let mut filename = String::new();
+        io::stdin().read_line(&mut filename).unwrap();
+
+        self.passwords.load(&filename);
     }
     
 }
