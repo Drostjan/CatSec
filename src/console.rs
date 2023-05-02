@@ -1,13 +1,20 @@
 use std::io;
 use std::io::Write;
-use rpassword::read_password;
 
+use aes::Aes128;
+use aes::cipher::{
+    BlockCipher, BlockEncrypt, BlockDecrypt, KeyInit,
+    generic_array::GenericArray,
+};
+
+use rpassword::read_password;
 use crate::pass::*;
 
 pub struct Console {
     logged: bool,
     username: String,
-    passwords: PassStorage
+    passwords: PassStorage,
+    key: Vec<u8>,
 }
 
 impl Console {
@@ -15,7 +22,8 @@ impl Console {
         Console {
             logged: false,
             username: String::new(),
-            passwords: PassStorage::new()
+            passwords: PassStorage::new(),
+            key: Vec::new(),
         }
     }
 
@@ -57,9 +65,19 @@ impl Console {
         let mut site = String::new();
         io::stdin().read_line(&mut site).unwrap();
 
+        let key = GenericArray::from([0u8; 16]);
+        self.key = key.to_vec();
+        
+        let mut block = GenericArray::default();
+        block.copy_from_slice(password.as_bytes());
+        let cipher = Aes128::new(&key);
+
+        cipher.encrypt_block(&mut block);
+        let ciphertext = String::from_utf8(block.to_vec()).unwrap();
+
         let pass = Password {
             username: username.replace("\n", ""),
-            password: password,
+            password: ciphertext.to_string(),
             site: site.replace("\n", "")
         };
 
@@ -75,7 +93,7 @@ impl Console {
         print!("new password:");
         io::stdout().flush().ok();
         let new_password = read_password().unwrap();
-
+        
         self.passwords.update_password(&site,&new_password);
     }
 
@@ -118,4 +136,5 @@ impl Console {
     pub fn load(&mut self, filename: &str){
         self.passwords.load(filename);
     }
+    
 }
