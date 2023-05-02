@@ -110,4 +110,12 @@ impl Console {
         println!(" show........... show a PasswordObject");
         println!(" q ............. exit program");
     }
+
+    pub fn save(&self, filename: &str) {
+        self.passwords.save(filename);
+    }
+
+    pub fn load(&mut self, filename: &str){
+        self.passwords.load(filename);
+    }
 }

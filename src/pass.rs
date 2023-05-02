@@ -1,13 +1,15 @@
-#![allow(unused_imports)]
+use std::fs::File;
+use std::io::{Read, Write};
+use serde::{Serialize, Deserialize};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Password {
     pub username: String,
     pub password: String,
     pub site: String,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PassStorage {
     pub passwords: Vec<Password>,
 }
@@ -48,5 +50,18 @@ impl PassStorage {
         return None;
     }
 
-    
+    pub fn save(&self, filename: &str) {
+        let mut file = File::create(filename).unwrap();
+        let serialized = serde_json::to_string(self).unwrap();
+        file.write_all(serialized.as_bytes()).unwrap();
+    }
+
+    pub fn load(&mut self, filename: &str) {
+        let mut file = File::open(filename).unwrap();
+        let mut contents = String::new();
+        file.read_to_string(&mut contents).unwrap();
+        let deserialized: PassStorage = serde_json::from_str(&contents).unwrap();
+        *self = deserialized;
+    }
+
 }
