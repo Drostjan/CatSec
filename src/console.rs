@@ -1,7 +1,5 @@
 use std::io;
 use std::io::Write;
-extern crate hex;
-
 use aes::Aes128;
 use aes::cipher::{
     BlockEncrypt, KeyInit,
@@ -18,7 +16,6 @@ pub struct Console {
     logged: bool,
     username: String,
     passwords: PassStorage,
-    key: Vec<u8>,
 }
 
 impl Console {
@@ -27,7 +24,6 @@ impl Console {
             logged: false,
             username: String::new(),
             passwords: PassStorage::new(),
-            key: Vec::new(),
         }
     }
 
@@ -74,15 +70,13 @@ impl Console {
         let mut padded_password = Vec::from(password.as_bytes());
         padded_password.extend(vec![pad_size as u8; pad_size]);
 
-        
-        let key = GenericArray::from([0u8; 16]);
-        self.key = key.to_vec();
+        let key = GenericArray::from([0u8; BLOCK_SIZE]);
         let mut block = GenericArray::default();
         block.copy_from_slice(&padded_password[..block_size]);
         
         let cipher = Aes128::new(&key);
         cipher.encrypt_block(&mut block);
-        let ciphertext = hex::encode(block);
+        let ciphertext = String::from_utf8_lossy(&block).to_string();
 
         let pass = Password {
             username: username.replace("\n", ""),
@@ -96,8 +90,8 @@ impl Console {
     pub fn update(&mut self){
         print!("site to modify password:");
         io::stdout().flush().ok();
-        let mut site = String::new();
-        io::stdin().read_line(&mut site).unwrap();
+        let site = String::new();
+        io::stdin().read_line(&mut site.replace("\n", "")).unwrap();
 
         print!("new password:");
         io::stdout().flush().ok();

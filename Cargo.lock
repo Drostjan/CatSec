@@ -15,10 +15,11 @@ dependencies = [
 
 [[package]]
 name = "catsec"
-version = "0.3.9-Pre"
+version = "0.3.95"
 dependencies = [
  "aes",
  "hex",
+ "md5",
  "rpassword",
  "serde",
  "serde_json",
@@ -101,6 +102,12 @@ name = "libc"
 version = "0.2.142"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6a987beff54b60ffa6d51982e1aa1146bc42f19bd26be28b0586f252fccf5317"
+
+[[package]]
+name = "md5"
+version = "0.7.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "490cc448043f947bae3cbee9c203358d62dbee0db12107a74be5c30ccfd09771"
 
 [[package]]
 name = "proc-macro2"

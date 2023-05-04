@@ -25,7 +25,7 @@ impl PassStorage {
     }
 
     pub fn update_password(&mut self, site: &str, new_password: &str) {
-        for password in self.passwords.iter_mut() {
+        for mut password in &mut self.passwords {
             if password.site == site {
                 password.password = new_password.to_string();
 
